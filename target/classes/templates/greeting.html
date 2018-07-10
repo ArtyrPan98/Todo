@@ -1,0 +1,143 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head> 
+    <title>Тестовый сайт</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" integrity="sha384-WskhaSGFgHYWDcbwN70/dfYBj47jz9qbsMId/iRN3ewGhXQFZCSftd1LZCfmhktB" crossorigin="anonymous">
+
+</head>
+<body>
+
+
+<table class="table  table-striped" id="table">
+    <thead>
+    <tr>
+        <th>
+            <form action="http://localhost:8080/listDay">
+                <input class="btn btn-outline-secondary" type="submit" value="На главную" />
+            </form>
+        </th>
+        <th>
+            <div class="input-group">
+                <input id="inputData" type="text" class="form-control" placeholder="Дата, в формате 01/07/2018" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" onclick="clicButton()">Вперед</button>
+                </div>
+            </div>
+        </th>
+        <th>
+            <form name="task" action="/add" method="post">
+                <div class="input-group">
+                    <input id="inputDataForm" title="day" type="hidden" value="" name="day">
+                    <input title="state" type="hidden" value="0" name="state">
+                    <input class="form-control" title="label" id="addTaskLabel" type="text" name="label">
+                    <input class="btn btn-outline-secondary" id='addTaskSubmit' type="submit" value="Добавить задачу">
+                </div>
+            </form>
+
+        </th>
+    </tr>
+
+    <tr>
+        <th scope="col">Приоритет</th>
+        <th scope="col">Задача</th>
+        <th scope="col">Статус</th>
+    </tr>
+    </thead>
+</table>
+
+
+</form>
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>
+<script>
+    var dayOzu = document.getElementById('inputData');
+
+    var addTaskSubmit = document.getElementById('addTaskSubmit');
+    var addTaskLabel = document.getElementById('addTaskLabel');
+    addTaskLabel.disabled = true;
+    addTaskSubmit.disabled = true;
+
+
+    if(dayOzu.value !== "" && dayOzu.value !== null){
+
+    }
+
+    if(localStorage.getItem("date") != null && localStorage.getItem("date") !== ""){
+        dayOzu.value = localStorage.getItem("date");
+        clicButton();
+    }
+
+
+    var day;
+    function clicButton(){
+        delTable();
+        var inputDate = document.getElementById('inputData');
+        localStorage.setItem("date",inputDate.value);
+        var element = document.getElementById('inputDataForm');
+        element.value = inputDate.value;
+        day = element.value;
+        gen();
+        addTaskLabel.disabled = false;
+        addTaskSubmit.disabled = false;
+    } // Генерация таблицы главная
+
+    function delTable() {
+        var table = document.getElementById('table');
+        for(var i = table.rows.length-1; i>0; i--){
+            table.deleteRow(i);
+        }
+    } // Удаление таблицы
+    //01/07/2018
+    function gen(){
+        $(document).ready(function () {
+            $.getJSON("http://localhost:8080/getTask/"+day, function (data) {
+                var tr;
+                for(var a = 3; a >= 0; a-- ){
+                    for(var i = 0; i<data.length; i++){
+                        if(data[i].priority === a){
+                            var valueState;
+                            var classBtnColor;
+                            if(data[i].state === 0){
+                                classBtnColor = 'btn btn-danger';
+                                valueState = "Не выполненно"}
+                            else if(data[i].state === 1){
+                                classBtnColor = 'btn btn-success';
+                                valueState = "Выполненно"}
+                            else valueState = "Не известно";
+
+                            tr = $('<tr/>');
+                            tr.append("<td >" +
+                                "<form name='id' method='post'>" +
+
+                                "<input title='id' type='hidden' value='"+data[i].id+"' name='id'>"+
+                                "<input type='submit' formaction='/increm' class='btn btn-outline-danger' value='[↑]'>" +
+                                "<input type='submit' disabled='disabled' class='btn btn-light' value='"+data[i].priority +"'>"+
+                                "<input type='submit' formaction='/decrim' class='btn btn-outline-success' value='[↓]'>" +
+                                "</td>");
+                            tr.append("<td >" + data[i].label + "</td>");
+                            tr.append("<td >" +
+                                "<form name='id' method='post'>" +
+                                "<input title='id' type='hidden' value='"+data[i].id+"' name='id'>"+
+                                "<input type='submit' formaction='/update' class='"+classBtnColor+"' value='"+valueState+"'>" +
+                                "<input type='submit' formaction='/delete' class='btn btn-dark' value='[X]'>" +
+                                "</td>");
+                            $('table').append(tr);
+                        }
+                    }
+                }
+
+
+            });
+
+        }); // Вывод информации
+    } // Получение Json
+
+</script>
+
+
+</body>
+
+</html>
