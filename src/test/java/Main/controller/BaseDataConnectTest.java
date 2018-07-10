@@ -2,6 +2,7 @@ package Main.controller;
 
 import Main.model.Task;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -11,7 +12,9 @@ import static org.junit.Assert.*;
 public class BaseDataConnectTest {
     static BaseDataConnect baseDataConnect = new BaseDataConnect();
     static ArrayList<Task> tasksDay1 = new ArrayList<>();
-    static {
+
+    @BeforeClass
+    static public void beforeClass(){
         tasksDay1.add(new Task(2, "01/02/2018", "Задача 1", 0, 0));
         tasksDay1.add(new Task(3, "01/02/2018", "Задача 2", 0, 0));
         tasksDay1.add(new Task(4, "01/02/2018", "Задача 3", 0, 0));
